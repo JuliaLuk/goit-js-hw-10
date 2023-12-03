@@ -11,7 +11,6 @@ fetchBreeds()
   .then(breeds => {
     select.style.visibility = 'visible';
     loader.style.display = 'none';
-
     const cat = breeds
       .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
       .join('');
@@ -36,7 +35,7 @@ function hendelSelect(event) {
   loader.style.display = 'block';
 
   fetchCatByBreed(selectedBreed).then(breeds => {
-    loader.style.display = 'none';
+    // loader.style.display = 'none';
     const catData = breeds[0];
     divPicture.innerHTML = `
     <img class="picture" src="${catData.url}" alt="${catData.breeds[0].name}">`;
