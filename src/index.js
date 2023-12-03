@@ -9,14 +9,16 @@ const catInfo = document.querySelector('.cat-info');
 
 fetchBreeds()
   .then(breeds => {
+    console.log(breeds);
     select.style.visibility = 'visible';
-    loader.style.display = 'none';
-    const cat = breeds
-      .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
-      .join('');
+    // loader.style.display = 'none';
+    // const cat = breeds
+    //   .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
+    //   .join('');
 
-    select.insertAdjacentHTML('beforeend', cat);
+    select.insertAdjacentHTML('beforeend', createMarkup(breeds));
   })
+
   .catch(error => {
     console.log(error);
     loader.style.display = 'none';
@@ -44,4 +46,19 @@ function hendelSelect(event) {
       <p class="text">${catData.breeds[0].description}</p>
       <p class="temp"><strong>Temperament:</strong> ${catData.breeds[0].temperament}</p>`;
   });
+}
+
+function createMarkup(arr) {
+  return arr
+    .map(
+      ({ name, image, temperament, description }) => `
+    <div class="cat-info">
+      <p class="cat-name">${name}</p>
+      <img class="div-picture" src="${image.url}" alt="${name}" />
+      <p class="cat-temp">${temperament}</p>
+      <p class="cat-descr">${description}</p>
+    </div>
+  `
+    )
+    .join('');
 }
