@@ -1,18 +1,48 @@
-import axios from 'axios';
-import { fetchBreeds } from './cat-api';
-// console.log(fetchBreeds);
+import { fetchBreeds, fetchCatByBreed } from './cat-api';
+// import Notiflix from 'notiflix';
+// import SlimSelect from 'slim-select';
 
-axios.defaults.headers.common['x-api-key'] =
-  'live_jkkLyqjTr8RbEPHLuS5UGhwJV6rcFi9zJesfe2p6RuvQ5zCatKJJ401i56PpvO61';
-
-const breedSelect = document.querySelector('.breed-select');
-// console.log(breedSelect);
+const select = document.querySelector('.breed-select');
+const loader = document.querySelector('.loader');
+const divPicture = document.querySelector('.div-picture');
 const catInfo = document.querySelector('.cat-info');
-// console.log(catInfo);
 
-breedSelect.addEventListener('click', hendelSelect);
+fetchBreeds()
+  .then(breeds => {
+    select.style.visibility = 'visible';
+    loader.style.display = 'none';
+
+    const cat = breeds
+      .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
+      .join('');
+
+    select.insertAdjacentHTML('beforeend', cat);
+  })
+  .catch(error => {
+    console.log(error);
+    loader.style.display = 'none';
+    // Notiflix.Notify.failure(
+    //   'Oops! Something went wrong! Try reloading the page!'
+    // );
+  });
+
+select.addEventListener('change', hendelSelect);
+divPicture.innerHTML = '';
+catInfo.innerHTML = '';
 function hendelSelect(event) {
   event.preventDefault();
-  const { id } = event.currentTarget.elements;
-  console.log(id);
+  const selectedBreed = this.value;
+
+  loader.style.display = 'block';
+
+  fetchCatByBreed(selectedBreed).then(breeds => {
+    loader.style.display = 'none';
+    const catData = breeds[0];
+    divPicture.innerHTML = `
+    <img class="picture" src="${catData.url}" alt="${catData.breeds[0].name}">`;
+    catInfo.innerHTML = `
+      <h2 class="title">${catData.breeds[0].name}</h2>
+      <p class="text">${catData.breeds[0].description}</p>
+      <p class="temp"><strong>Temperament:</strong> ${catData.breeds[0].temperament}</p>`;
+  });
 }
