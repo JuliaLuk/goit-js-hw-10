@@ -1,64 +1,147 @@
-import { fetchBreeds, fetchCatByBreed } from './cat-api';
-// import Notiflix from 'notiflix';
-// import SlimSelect from 'slim-select';
+// import { fetchBreeds, fetchCatByBreed } from './cat-api';
+// // import Notiflix from 'notiflix';
+// // import SlimSelect from 'slim-select';
 
-const select = document.querySelector('.breed-select');
-const loader = document.querySelector('.loader');
-const divPicture = document.querySelector('.div-picture');
+// const select = document.querySelector('.breed-select');
+// const loader = document.querySelector('.loader');
+// const divPicture = document.querySelector('.div-picture');
+// const catInfo = document.querySelector('.cat-info');
+
+// fetchBreeds()
+//   .then(breeds => {
+//     console.log('jcm lt', breeds);
+//     select.style.visibility = 'visible';
+//     // loader.style.display = 'none';
+//     // const cat = breeds
+//     //   .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
+//     //   .join('');
+
+//     select.insertAdjacentHTML('beforeend', createMarkup(breeds.data));
+//   })
+
+//   .catch(error => {
+//     console.log(error);
+//     loader.style.display = 'none';
+//     // Notiflix.Notify.failure(
+//     //   'Oops! Something went wrong! Try reloading the page!'
+//     // );
+//   });
+
+// select.addEventListener('change', hendelSelect);
+// divPicture.innerHTML = '';
+// catInfo.innerHTML = '';
+// function hendelSelect(event) {
+//   event.preventDefault();
+//   const selectedBreed = this.value;
+
+//   loader.style.display = 'block';
+
+//   fetchCatByBreed(selectedBreed).then(breeds => {
+//     // loader.style.display = 'none';
+//     const catData = breeds[0];
+//     divPicture.innerHTML = `
+//     <img class="picture" src="${catData.url}" alt="${catData.breeds[0].name}">`;
+//     catInfo.innerHTML = `
+//       <h2 class="title">${catData.breeds[0].name}</h2>
+//       <p class="text">${catData.breeds[0].description}</p>
+//       <p class="temp"><strong>Temperament:</strong> ${catData.breeds[0].temperament}</p>`;
+//   });
+// }
+
+// function createMarkup(arr) {
+//   return arr
+
+//     .map(
+//       ({ name, image, temperament, description }) => `
+//     <div class="cat-info">
+//       <p class="cat-name">${name}</p>
+//       <img class="div-picture" src="${image}" alt="${name}" />
+//       <p class="cat-temp">${temperament}</p>
+//       <p class="cat-descr">${description}</p>
+//     </div>
+//   `
+//     )
+//     .join('');
+// }
+
+// ---------------------
+import { fetchBreeds, fetchCatByBreed } from './cat-api.js';
+import Notiflix from 'notiflix';
+import SlimSelect from 'slim-select';
+
+const breedSelect = document.querySelector('.breed-select');
 const catInfo = document.querySelector('.cat-info');
+const loader = document.querySelector('.loader');
+const error = document.querySelector('.error');
+const divPicture = document.querySelector('.div-picture');
+
+function toggleLoader(display) {
+  loader.style.display = display;
+}
+
+function toggleCanInfo(display) {
+  catInfo.style.display = display;
+}
+
+toggleLoader('none');
+error.style.display = 'none';
+
+toggleLoader('block');
 
 fetchBreeds()
   .then(breeds => {
-    console.log(breeds);
-    select.style.visibility = 'visible';
-    // loader.style.display = 'none';
-    // const cat = breeds
-    //   .map(breed => `<option value="${breed.id}">${breed.name}</option>`)
-    //   .join('');
+    toggleLoader('none');
 
-    select.insertAdjacentHTML('beforeend', createMarkup(breeds));
+    const positionBreeds = breeds.map(breed => {
+      const option = document.createElement('option');
+      option.value = breed.id;
+      option.textContent = breed.name;
+      return option;
+    });
+    breedSelect.append(...positionBreeds);
+
+    new SlimSelect({
+      select: '.breed-select',
+    });
   })
-
-  .catch(error => {
-    console.log(error);
-    loader.style.display = 'none';
-    // Notiflix.Notify.failure(
-    //   'Oops! Something went wrong! Try reloading the page!'
-    // );
+  .catch(() => {
+    Notiflix.Notify.warning(
+      '❌ Oops! Something went wrong! Try reloading the page!',
+      {
+        // position: 'center-top' ,
+      }
+    );
+  })
+  .finally(() => {
+    toggleLoader('none');
   });
 
-select.addEventListener('change', hendelSelect);
-divPicture.innerHTML = '';
-catInfo.innerHTML = '';
-function hendelSelect(event) {
-  event.preventDefault();
-  const selectedBreed = this.value;
+breedSelect.addEventListener('change', event => {
+  toggleCanInfo('none');
+  toggleLoader('block');
 
-  loader.style.display = 'block';
+  fetchCatByBreed(event.target.value)
+    .then(cat => {
+      toggleLoader('none');
+      toggleCanInfo('block');
 
-  fetchCatByBreed(selectedBreed).then(breeds => {
-    // loader.style.display = 'none';
-    const catData = breeds[0];
-    divPicture.innerHTML = `
-    <img class="picture" src="${catData.url}" alt="${catData.breeds[0].name}">`;
-    catInfo.innerHTML = `
-      <h2 class="title">${catData.breeds[0].name}</h2>
-      <p class="text">${catData.breeds[0].description}</p>
-      <p class="temp"><strong>Temperament:</strong> ${catData.breeds[0].temperament}</p>`;
-  });
-}
+      divPicture.innerHTML = `
+    <img class="picture" src="${cat.url}" alt="${cat.breeds[0].name}">`;
+      catInfo.innerHTML = `
+      <h2 class="title">${cat.breeds[0].name}</h2>
+      <p class="text">${cat.breeds[0].description}</p>
+      <p class="temp"><strong>Temperament:</strong> ${cat.breeds[0].temperament}</p>`;
+    })
 
-function createMarkup(arr) {
-  return arr
-    .map(
-      ({ name, image, temperament, description }) => `
-    <div class="cat-info">
-      <p class="cat-name">${name}</p>
-      <img class="div-picture" src="${image.url}" alt="${name}" />
-      <p class="cat-temp">${temperament}</p>
-      <p class="cat-descr">${description}</p>
-    </div>
-  `
-    )
-    .join('');
-}
+    .catch(() => {
+      Notiflix.Notify.warning(
+        '❌ Oops! Something went wrong! Try reloading the page!',
+        {
+          //  position: 'center-top' ,
+        }
+      );
+    })
+    .finally(() => {
+      toggleLoader('none');
+    });
+});
