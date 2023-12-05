@@ -46,7 +46,7 @@ body {
 }
 
 /* --------------------loader------------------------------- */
-.loader {
+/* .loader {
   animation: rotate 1s infinite;
   height: 50px;
   width: 50px;
@@ -119,6 +119,6 @@ body {
     box-shadow: 30px 0 0 #fff;
     margin-top: 0;
   }
-}
+} */
 
 /* ============================================== */
