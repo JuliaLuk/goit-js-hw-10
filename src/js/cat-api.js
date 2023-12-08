@@ -6,6 +6,9 @@ axios.defaults.baseURL = 'https://api.thecatapi.com/v1/';
 
 export const fetchBreeds = () => {
   return axios.get('breeds').then(response => response.data);
+  if (!result.ok) {
+    throw new Error('Oops! Something went wrong! Try reloading the page!');
+  }
 };
 
 export const fetchCatByBreed = breedId => {
