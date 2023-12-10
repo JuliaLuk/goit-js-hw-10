@@ -18,7 +18,6 @@ function toggleCanInfo(display) {
 }
 
 toggleLoader('none');
-error.style.display = 'none';
 
 toggleLoader('block');
 
@@ -37,6 +36,7 @@ fetchBreeds()
     new SlimSelect({
       select: '.breed-select',
     });
+    breedSelect.classList.remove('is-hidden');
   })
   .catch(() => {
     Notiflix.Notify.warning(
@@ -45,6 +45,7 @@ fetchBreeds()
         position: 'center-top',
       }
     );
+    error.classList.remove('is-hidden');
   })
   .finally(() => {
     toggleLoader('none');
